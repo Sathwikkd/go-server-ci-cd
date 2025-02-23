@@ -1,0 +1,46 @@
+name: CI/CD to GCE with Artifact Registry
+
+on:
+  push:
+    branches:
+      - main
+
+
+jobs:
+  build:
+    name: Build the docker image and Push to Artifact Registry
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate With Google Cloud
+        uses:  google-github-actions/auth@v2
+        with:
+          credentials_json: ${{secrets.GCP_SERVICE_KEY}}
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev
+
+      - name: Build and Push Docker Image
+        run: |
+          IMAGE_NAME=us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/go-server-repo/go-server:latest
+          docker build -t $IMAGE_NAME .
+          docker push $IMAGE_NAME
+
+  deploy:
+    name: Deploy to GCE
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: SSH into VM and Deploy
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.GCP_INSTANCE_HOST }}
+          username: ${{ secrets.GCP_INSTANCE_USERNAME }}
+          key: ${{ secrets.GCE_SSH_PRIVATE_KEY }}
+          script: |
+            docker pull us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/go-server-repo/go-server:latest
+            docker run -d --name go-server -p 8080:8080 us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/go-server-repo/go-server:latest
