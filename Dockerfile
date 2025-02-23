@@ -1,5 +1,5 @@
 # First stage: Build the Go application
-FROM golang:1.21 AS builder
+FROM golang:latest AS builder
 
 # Set the working directory inside the container
 WORKDIR /app
