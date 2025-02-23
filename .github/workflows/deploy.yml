@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build the docker image and Push to Artifact Registry
+    name: Build
     runs-on: ubuntu-latest
 
     steps:
@@ -20,12 +20,12 @@ jobs:
         with:
           credentials_json: ${{secrets.GCP_SERVICE_KEY}}
 
-      - name: Configure Docker for Artifact Registry
-        run: gcloud auth configure-docker us-central1-docker.pkg.dev
+      - name: Docker Hub Login
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build and Push Docker Image
         run: |
-          IMAGE_NAME=us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/go-server-repo/go-server:latest
+          IMAGE_NAME=docker.io/vithsutratechnologies/go-server:latest
           docker build -t $IMAGE_NAME .
           docker push $IMAGE_NAME
 
@@ -42,5 +42,5 @@ jobs:
           username: ${{ secrets.GCP_INSTANCE_USERNAME }}
           key: ${{ secrets.GCE_SSH_PRIVATE_KEY }}
           script: |
-            docker pull us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/go-server-repo/go-server:latest
-            docker run -d --name go-server -p 8080:8080 us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/go-server-repo/go-server:latest
+            docker pull docker.io/vithsutratechnologies/go-server:latest
+            docker run -d --name go-server -p 8080:8080 docker.io/vithsutratechnologies/go-server:latest
