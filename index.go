@@ -6,7 +6,7 @@ import (
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Hello, World! This is a CI/CD Pipeline Test.")
+	fmt.Fprintln(w, "Hello, World! This is a CI/CD Pipeline Test. and CICD has deployed successfully..!!!")
 }
 
 func main() {
