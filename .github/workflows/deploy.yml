@@ -43,4 +43,6 @@ jobs:
           key: ${{ secrets.GCE_SSH_PRIVATE_KEY }}
           script: |
             docker pull docker.io/vithsutratechnologies/go-server:latest
+            docker kill $(docker ps -a -q)
+            docker rm $(docker ps -a -q)
             docker run -d --name go-server -p 8080:8080 docker.io/vithsutratechnologies/go-server:latest
