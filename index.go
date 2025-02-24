@@ -3,10 +3,11 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Hello, World! This is a CI/CD Pipeline Test. and CICD has deployed successfully..!!! done by sathwik and gowtham ❤️💩🫡📱🫨💀😘🈲🈹🈵🈴")
+	fmt.Fprintf(w, "Hello, World! %s", os.Getenv("NAME"))
 }
 
 func main() {
